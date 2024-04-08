@@ -1,6 +1,6 @@
 ---
 title: "RandomRandevouz"
-author: "Alex Alvarez"
+author: "Riley Kehoe"
 date: "2024-04-08"
 output: word_document
 ---
@@ -24,6 +24,7 @@ The R code at the end of this assignment simulates $N$ repetitions of this rando
 
 
 a) Run the R code for 10,000 repetitions, with a wait time of 15 minutes. Produce and submit a scatterplot of the pairs of arrival times. Comment on what the scatterplot reveals, and report the approximate probability that Kareem and Kathleen meet.
+
 
 
 ```{r}
@@ -59,19 +60,256 @@ points(time1[meet=='FALSE'], time2[meet=='FALSE'], pch = 20, col="red")
 probmeet = sum(meet)/N
 cat("Probability of meeting: ", probmeet)
 ```
-
+The scatterplot reveals the two arrival times, time1 and time2 for Kareem and Kathleen respectively for each of the 10,000 repetitions. The green points represent the pairs of arrival times where the two people successfully meet, while the red points represent the pairs of arrival times where the two people do not meet. The empirical probability that Kareem and Kathleen meet is 0.4235.
 
 b) Increase the number of repetitions to 1,000,000 days. Report the approximate probability that Kareem and Kathleen meet. Because both distributions are uniform and independent of each other, exact probabilities can be calculated by determining the area of the region of interest as a fraction of the total area of the 60×60 square.
+
+```{r}
+# User must first enter values for number of repititions (N) AND how long each person agrees to wait
+N = 1000000
+wait = 15
+
+# Generate random arrival times
+time1 = runif(N, 0, 60)
+time2 = runif(N, 0, 60)
+
+# Calculate difference AND absolute difference in arrival times
+diff = time1 - time2
+absdiff = abs(diff)
+
+# Produce graphs of these two variables
+hist(diff)
+hist(absdiff)
+
+# Determine whether or not meeting occurs
+meet = (absdiff < wait)
+
+
+
+# Produce scatter plot of arrival times with different symbols for meet/don't meet
+
+plot(time1, time2, type='n')
+points(time1[meet=='TRUE'], time2[meet=='TRUE'], pch = 20, col="green")
+points(time1[meet=='FALSE'], time2[meet=='FALSE'], pch = 20, col="red")
+
+
+# Calculate approx probability
+probmeet = sum(meet)/N
+cat("Probability of meeting: ", probmeet)
+```
+The approximate probability that Kareem and Kathleen meet is 0.438726.  Here is how to find exact probabilities can be calculated by determining the area of the region of interest as a fraction of the total area of the 60×60 square:
 
 
 c) Draw (by hand is fine) a 60×60 square to represent the sample space of all possible pairs of arrival times. Label one of the axes for Kareem’s arrival time and the other for Kathleen’s arrival time. Then shade in the region of the square corresponding to the event that they arrive within 15 minutes of each other and therefore successfully meet.
 
+On paper.
 
 d) Use geometry to determine the area of the region in which Kareem and Kathleen successfully meet. Then divide by the total area of the square to determine the probability that they meet. Is the actual probability within the error bound of the approximate probability from your simulation analysis?
 
+Area of square = 60*60 = 3600
+Area of region where they meet = 60*60 - 1/2(45*45) - 1/2(45*45) = 
+3600 - 1/2(2025) - 1/2(2025) = 3600 - 2025 = 1575
+Probability of meeting = 1575/3600 = 0.4375
+Yes, the actual probability is within the error bound of the approximate probability from the simulation analysis.
 
 e) Now let m represent the number of minutes that both people agree to wait, where m can be any real number between 0 and 60. Use geometry to express the probability that they successfully meet as a function of m. Also produce (and submit) a graph of this probability as a function of m, and comment on its behavior.
 
+```{r}
+
+probmeet = function(m) {
+    return(1 - (1 - m/60)^2)
+}
+
+m = seq(0, 60, 1)
+p = probmeet(m)
+plot(m, p, type='l')
+```
+
+The probability that Kareem and Kathleen meet is a function of the number of minutes they agree to wait. The probability increases as the number of minutes they agree to wait increases. It tapers off as the number of minutes they agree to wait approaches 60.
 
 f) Determine how long each person would have to agree to wait in order for this probability (of successfully meeting the other person) to be at least .5. Then determine how long each person would have to agree to wait in order for this probability to be at least .9.
 
+```{r}
+m = 60*(1 - sqrt(0.5))
+cat("Each person would have to agree to wait ", m, " minutes in order for the probability of meeting to be at least 0.5.")
+m = 60*(1 - sqrt(0.1))
+cat("Each person would have to agree to wait ", m, " minutes in order for the probability of meeting to be at least 0.9.")
+```
+
+
+## **Part 2: Normal**
+
+Now suppose that each person’s arrival time, in minutes after noon, follows a normal distribution with mean 30 and standard deviation 10. Continue to assume that they arrive independently of each other and that they agree to wait for 15 minutes.
+
+g) Modify the R code to simulate this random process. [Hint: The command to simulate random
+data from a normal distribution is: rnorm(number_of_repetitions, mean, sd).] Run the R code for
+10,000 repetitions, with a wait time of 15 minutes. Produce and submit a scatterplot of the pairs
+of arrival times. Comment on how this scatterplot differs from the previous one. Also report the
+approximate probability that Kareem and Kathleen meet. The exact probability that they meet
+can be determined from a normal distribution, using the result about linear combinations of
+normal distributions.
+
+```{r}
+# User must first enter values for number of repititions (N) AND how long each person agrees to wait
+N = 10000
+wait = 15
+
+# Generate random arrival times
+time1 = rnorm(N, 30, 10)
+time2 = rnorm(N, 30, 10)
+
+# Calculate difference AND absolute difference in arrival times
+diff = time1 - time2
+absdiff = abs(diff)
+
+# Produce graphs of these two variables
+
+hist(diff)
+hist(absdiff)
+
+# Determine whether or not meeting occurs
+
+meet = (absdiff < wait)
+
+
+plot(time1, time2, type='n')
+points(time1[meet=='TRUE'], time2[meet=='TRUE'], pch = 20, col="green")
+points(time1[meet=='FALSE'], time2[meet=='FALSE'], pch = 20, col="red")
+
+probmeet = sum(meet)/N
+cat("Probability of meeting: ", probmeet)
+```
+This scatterplot differs from the previous one in that the points are more concentrated around the mean of 30. The empirical probability that Kareem and Kathleen meet is 0.71.
+
+
+h) Report the probability distribution of the difference (not absolute difference) in the arrival
+times of Kareem and Kathleen. [Hint: You might let Tj represent Kareem’s arrival time and Tk
+represent Kathleen’s arrival time, both in minutes after noon. Use what you know about normal
+distributions to specify the probability distribution of the difference D = Tj – Tk.]
+
+```{r}
+# User must first enter values for number of repititions (N) AND how long each person agrees to wait
+N = 10000
+wait = 15
+
+# Generate random arrival times
+time1 = rnorm(N, 30, 10)
+time2 = rnorm(N, 30, 10)
+
+# Calculate difference AND absolute difference in arrival times
+diff = time1 - time2
+
+# Find the probability distribution of the difference in arrival times
+
+hist(diff)
+
+
+```
+$$
+
+\begin{aligned}
+T_j \sim N(30, 10^2) \
+T_k \sim N(30, 10^2) \
+D = T_j - T_k \
+\end{aligned}
+\
+$$
+we know he linear combination of Normal random variables is a normal random variable
+$$
+\begin{aligned}
+E(T_j - T_k) &= E(T_j) - E(T_k) \
+ &= 30 - 30 \
+ &= 0 \
+\end{aligned}
+$$
+
+The Joint variance is:
+$$
+\begin{aligned}
+Var(D) &= Var(T_j) + Var(T_k) \
+ &= 10^2 + 10^2 \
+ &= 200 \
+\end{aligned}
+$$
+Therefore,
+$$
+D = T_j - T_k \sim N(0,200)
+$$
+
+
+
+i) Use appropriate normal probability calculations to determine the probability that the two
+people successfully meet. Also report the values of the appropriate z-scores. [Hint: First express
+the probability that they successfully meet in terms of the random variable D.]
+
+```{r}
+# User must first enter values for number of repititions (N) AND how long each person agrees to wait
+N = 10000
+wait = 15
+
+# Generate random arrival times
+time1 = rnorm(N, 30, 10)
+time2 = rnorm(N, 30, 10)
+
+# Calculate difference AND absolute difference in arrival times
+
+diff = time1 - time2
+absdiff = abs(diff)
+
+# Find the probability that the two people successfully meet
+
+# P(-15 < D < 15)
+# The standard deviation of the difference in arrival times is the square root of the sum of the variances of the two arrival times.  The variance of each arrival time is 10^2 = 100.  The sum of the variances is 200.  The square root of 200 is 10*sqrt(2).
+
+# Z score for D = -15
+z_neg15 = (-15)/(10*sqrt(2))
+probmeet1 = pnorm(z_neg15)
+cat("Z-score: ", z_neg15, "\n")
+
+# Z score for D = 15
+z_15 = (15)/(10*sqrt(2))
+probmeet2 = pnorm(z_15)
+cat("Z-score: ", z_15, "\n")
+
+# Probability that the two people successfully meet
+probmeet = probmeet2 - probmeet1
+cat("Probability of meeting: ", probmeet)
+
+```
+
+j) Now let m represent the number of minutes that both people agree to wait, where m can be any
+real number. Determine the value of m so the probability of meeting is .9.
+
+```{r}
+# Determine the value of m so the probability of meeting is 0.9
+
+# P(-m < D < m) = 0.9
+# P(D < m) - P(D < -m) = 0.9
+# P(D < m) - P(D < -m) = 0.9
+# P(D < m) - (1 - P(D < m)) = 0.9
+# 2P(D < m) - 1 = 0.9
+# 2P(D < m) = 1.9
+# P(D < m) = 0.95
+
+# Z score for D = m
+z_m = qnorm(0.95)
+m = z_m*(10*sqrt(2))
+cat("Each person would have to agree to wait ", m, " minutes in order for the probability of meeting to be at least 0.9.")
+
+
+```
+
+
+k) Now suppose that Kareem and Kathleen can only afford to wait for 15 minutes, but they want
+to have at least a 90% chance of successfully meeting. Continue to assume that their arrival times
+follow independent normal distributions with mean 30 and the same SD as each other. Determine
+how small that SD needs to be in order to meet their criteria. (As always, show your work)
+
+```{r}
+
+z_15 = qnorm(0.95)
+
+sd = 15/(z_15)
+cat("The standard deviation needs to be ", sd, " in order to meet their criteria.")
+
+```
