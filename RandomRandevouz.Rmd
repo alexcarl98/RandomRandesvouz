@@ -1,0 +1,77 @@
+---
+title: "RandomRandevouz"
+author: "Alex Alvarez"
+date: "2024-04-08"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Lab: Random Rendezvous**
+
+Suppose two people (let’s call them Kareem and Kathleen) agree to meet for lunch at a certain restaurant. But these are both important people who can’t be sure when they’ll be able to get away, so both arrival times are random variables, independent of each other. 
+
+If each person agrees to wait exactly 15 minutes for the other before giving up and leaving, what is the probability that the two of them actually meet?
+
+## **Part 1: Uniform**
+
+First suppose that the arrival time for each person, in minutes after noon, is uniformly distributed between 0 and 60. Also assume that the two arrival times are independent of each other. We will first use a simulation to investigate what happens when the random process of their lunch meeting is repeated for a large number of days.
+
+
+The R code at the end of this assignment simulates $N$ repetitions of this random process and approximates the probability that the two people successfully meet.
+
+
+a) Run the R code for 10,000 repetitions, with a wait time of 15 minutes. Produce and submit a scatterplot of the pairs of arrival times. Comment on what the scatterplot reveals, and report the approximate probability that Kareem and Kathleen meet.
+
+
+```{r}
+# User must first enter values for number of repititions (N) AND how long each person agrees to wait
+N = 10000
+wait = 15
+
+# Generate random arrival times
+time1 = runif(N, 0, 60)
+time2 = runif(N, 0, 60)
+
+# Calculate difference AND absolute difference in arrival times
+diff = time1 - time2
+absdiff = abs(diff)
+
+# Produce graphs of these two variables
+hist(diff)
+hist(absdiff)
+
+# Determine whether or not meeting occurs
+meet = (absdiff < wait)
+
+
+
+# Produce scatter plot of arrival times with different symbols for meet/don't meet
+
+plot(time1, time2, type='n')
+points(time1[meet=='TRUE'], time2[meet=='TRUE'], pch = 20, col="green")
+points(time1[meet=='FALSE'], time2[meet=='FALSE'], pch = 20, col="red")
+
+
+# Calculate approx probability
+probmeet = sum(meet)/N
+cat("Probability of meeting: ", probmeet)
+```
+
+
+b) Increase the number of repetitions to 1,000,000 days. Report the approximate probability that Kareem and Kathleen meet. Because both distributions are uniform and independent of each other, exact probabilities can be calculated by determining the area of the region of interest as a fraction of the total area of the 60×60 square.
+
+
+c) Draw (by hand is fine) a 60×60 square to represent the sample space of all possible pairs of arrival times. Label one of the axes for Kareem’s arrival time and the other for Kathleen’s arrival time. Then shade in the region of the square corresponding to the event that they arrive within 15 minutes of each other and therefore successfully meet.
+
+
+d) Use geometry to determine the area of the region in which Kareem and Kathleen successfully meet. Then divide by the total area of the square to determine the probability that they meet. Is the actual probability within the error bound of the approximate probability from your simulation analysis?
+
+
+e) Now let m represent the number of minutes that both people agree to wait, where m can be any real number between 0 and 60. Use geometry to express the probability that they successfully meet as a function of m. Also produce (and submit) a graph of this probability as a function of m, and comment on its behavior.
+
+
+f) Determine how long each person would have to agree to wait in order for this probability (of successfully meeting the other person) to be at least .5. Then determine how long each person would have to agree to wait in order for this probability to be at least .9.
+
